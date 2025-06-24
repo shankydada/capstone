@@ -1,6 +1,8 @@
-streamlit
-yfinance
+tensorflow>=2.12
+keras
 pandas
 numpy
-matplotlib
-backend
+yfinance
+scikit-learn
+plotly
+streamlit
