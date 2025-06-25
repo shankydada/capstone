@@ -52,6 +52,7 @@ def build_dl_model(model_type, input_shape):
 def predict_stock_price_all_models(symbol, start_date, end_date, model_type, forecast_days=6):
     df = fetch_data(symbol, start_date, end_date)
     if df is None or df.empty:
+        print("No data fetched.")
         return None
 
     try:
@@ -59,27 +60,41 @@ def predict_stock_price_all_models(symbol, start_date, end_date, model_type, for
         window = 60
         X, y = create_sequences(data, window)
 
-        # Model building
+        print(f"Selected model: {model_type}, training on {X.shape[0]} samples.")
+
         if model_type in ['LSTM', 'RNN']:
-            X = np.reshape(X, (X.shape[0], X.shape[1], 1))
+            if len(X.shape) == 2:
+                X = np.reshape(X, (X.shape[0], X.shape[1], 1))
             model = build_dl_model(model_type, (X.shape[1], 1))
-            model.fit(X, y, epochs=5, batch_size=32, verbose=0)
+            print(f"Training {model_type} model...")
+            model.fit(X, y, epochs=5, batch_size=32, verbose=1)
+            print(f"{model_type} model training complete.\n")
         elif model_type == 'DNN':
             model = build_dl_model(model_type, (X.shape[1],))
-            model.fit(X, y, epochs=5, batch_size=32, verbose=0)
+            print("Training DNN model...")
+            model.fit(X, y, epochs=5, batch_size=32, verbose=1)
+            print("DNN model training complete.\n")
         elif model_type == 'Random Forest':
             model = RandomForestRegressor(n_estimators=100)
+            print("Training Random Forest model...")
             model.fit(X, y)
+            print("Random Forest training complete.\n")
         elif model_type == 'Linear Regression':
             model = LinearRegression()
+            print("Training Linear Regression model...")
             model.fit(X, y)
+            print("Linear Regression training complete.\n")
         else:
+            print("Unsupported model type.")
             return None
 
-        # Forecasting future prices
+        # Forecasting
         last_sequence = data[-window:]
-        future_predictions = []
+        if last_sequence.shape[0] != window:
+            print("Warning: Last sequence length mismatch.")
+            return None
 
+        future_predictions = []
         for _ in range(forecast_days):
             if model_type in ['LSTM', 'RNN']:
                 input_seq = last_sequence.reshape(1, window, 1)
@@ -94,9 +109,7 @@ def predict_stock_price_all_models(symbol, start_date, end_date, model_type, for
             future_predictions.append(pred)
             last_sequence = np.append(last_sequence[1:], [[pred]], axis=0)
 
-        # Reverse scaling
         predicted_prices = scaler.inverse_transform(np.array(future_predictions).reshape(-1, 1)).flatten()
-
         future_dates = pd.date_range(df.index[-1] + pd.Timedelta(days=1), periods=forecast_days)
         pred_df = pd.DataFrame({'Predicted Price': predicted_prices}, index=future_dates)
         return pred_df

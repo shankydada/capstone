@@ -1,5 +1,3 @@
-# main_app.py (Final Enhanced Version)
-
 import streamlit as st
 import plotly.graph_objs as go
 import plotly.express as px
@@ -14,30 +12,99 @@ from backend.backtesting import backtest
 from backend.metrices import calculate_sharpe_ratio, calculate_max_drawdown
 from backend.ai_prediction import predict_stock_price_all_models
 
-# Set page config
+# Page config
+page_bg_img = """
+    <style>
+    [data-testid="stAppViewContainer"]{
+    background-image: url("https://as2.ftcdn.net/v2/jpg/05/68/85/27/1000_F_568852772_P4EmbKP8YPargzsPzNQAxUR1JIHFhMlt.jpg");
+    background-size: cover;
+    background-position: top left;
+    background-repeat: no-repeat;
+    }
+
+    [data-testid="stHeader"]{
+    background: rgba(0,0,0,0);
+    }
+
+    [data-testid="stSidebar"]{
+     background-image: url("https://th.bing.com/th/id/OIP.OBewGnRT9OghDc7TpUaUOQHaER?w=266&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3");
+    background-position: center;
+    }
+
+
+    </style>"""
+
+st.markdown(page_bg_img, unsafe_allow_html=True)
 st.set_page_config(page_title="AI Stock Dashboard", layout="wide", page_icon="📊")
 
-# Custom CSS Styling
+# ---------------------------
+# Custom STYLING: Background, Inputs, Buttons, Tabs
+# ---------------------------
 st.markdown("""
 <style>
-html, body, [class*="css"] {
+/* Full background image */
+body {
+    background-image: url('https://4kwallpapers.com/images/walls/thumbs/13833.jpg');
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* Vibrant Neon Tabs */
+.css-1r6slb0 { background-color: rgba(0, 0, 0, 0.7) !important; }
+
+h1, h2, h3, h4 {
     font-family: 'Segoe UI', sans-serif;
-    background-color: #121212;
+    color: #00ffe1;
+    text-shadow: 0 0 8px #00fff7, 0 0 4px #00c3ff;
+}
+
+/* Sidebar Styling */
+.css-1d391kg { background-color: rgba(0,0,0,0.8) !important; }
+.css-1v0mbdj p {
     color: #ffffff;
 }
-.sidebar .sidebar-content {
-    background-color: #1e1e1e;
+
+/* Input fields & dropdowns */
+input, select, textarea {
+    background-color: #1e1e1e !important;
+    color: #ffffff !important;
+    border: 2px solid #00e1ff !important;
+    border-radius: 10px;
+    padding: 8px;
+    box-shadow: 0px 0px 6px #00ffff;
 }
-[data-testid="stMetricDelta"] {
-    color: #29b6f6;
+
+/* Sliders */
+.stSlider > div > div {
 }
-h1, h2, h3 {
-    color: #29b6f6;
+
+/* Button Styling */
+.stButton > button {
+    background: linear-gradient(90deg, #00f2ff, #00ff85, #00c3ff);
+    color: black;
+    font-weight: bold;
+    border-radius: 12px;
+    border: none;
+    padding: 0.6em 1.4em;
+    font-size: 16px;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 0 10px #00ffe1, 0 0 20px #00ffa6;
+}
+
+.stButton > button:hover {
+    transform: scale(1.07);
+    background: linear-gradient(270deg, #00f2ff, #00ff85, #00c3ff);
+    box-shadow: 0 0 18px #00ffe1, 0 0 28px #00ffa6;
+    cursor: pointer;
 }
 </style>
 """, unsafe_allow_html=True)
 
+# ---------------------------
 # Layout Tabs
+# ---------------------------
 tab1, tab2, tab3 = st.tabs(["📈 Backtesting", "🤖 AI Predictor", "📊 Visual Insights"])
 
 # ---------------------------
@@ -147,7 +214,6 @@ with tab3:
                 st.subheader("📋 Data Snapshot")
                 st.dataframe(df.tail(), use_container_width=True)
 
-                # 📈 Plot core price features
                 st.subheader("📈 Price Trends")
                 core_cols = ['Open', 'High', 'Low', 'Close', 'Volume']
                 for col in core_cols:
@@ -155,7 +221,6 @@ with tab3:
                         fig = px.line(df, x=df.index, y=col, title=f"{col} over Time")
                         st.plotly_chart(fig, use_container_width=True)
 
-                # 📉 Risk–Reward Metrics (calculated manually)
                 if 'Close' in df.columns:
                     df['Returns'] = df['Close'].pct_change()
                     st.subheader("📉 Risk–Reward Potential")
@@ -170,7 +235,6 @@ with tab3:
                     st.metric("Volatility (Daily)", f"{std_dev:.2%}")
                     st.plotly_chart(px.histogram(df, x='Returns', nbins=60, title="Return Distribution"), use_container_width=True)
 
-                # 📊 Simple Moving Averages
                 if 'Close' in df.columns:
                     st.subheader("📊 Moving Averages")
                     df['SMA_20'] = df['Close'].rolling(20).mean()
@@ -182,13 +246,11 @@ with tab3:
                     fig.update_layout(template="plotly_dark", title="SMA Trends")
                     st.plotly_chart(fig, use_container_width=True)
 
-                # 🔍 Correlation Heatmap
                 st.subheader("🔎 Correlation Matrix")
                 numeric = df.select_dtypes(include='number')
                 if not numeric.empty:
                     st.plotly_chart(px.imshow(numeric.corr(), title="Correlation Heatmap"), use_container_width=True)
                 else:
                     st.warning("No numeric columns found for correlation.")
-
         except Exception as e:
             st.error(f"⚠️ Something went wrong: {e}")
