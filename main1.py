@@ -16,7 +16,7 @@ from backend.ai_prediction import predict_stock_price_all_models
 page_bg_img = """
     <style>
     [data-testid="stAppViewContainer"]{
-    background-image: url("https://as2.ftcdn.net/v2/jpg/05/68/85/27/1000_F_568852772_P4EmbKP8YPargzsPzNQAxUR1JIHFhMlt.jpg");
+    background-image: url("https://marketspotter.io/wp-content/uploads/2023/09/trading-bearish-1000x484.jpg");
     background-size: cover;
     background-position: top left;
     background-repeat: no-repeat;
