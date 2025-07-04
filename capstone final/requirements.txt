@@ -1,0 +1,19 @@
+tensorflow>=2.12
+keras
+pandas
+numpy
+yfinance
+scikit-learn
+plotly
+streamlit
+# requirements.txt
+streamlit
+pandas
+numpy
+plotly
+dash
+dash-bootstrap-components
+scikit-learn
+tensorflow
+keras
+yfinance
