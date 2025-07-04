@@ -27,7 +27,7 @@ page_bg_img = """
     }
 
     [data-testid="stSidebar"]{
-     background-image: url("https://th.bing.com/th/id/OIP.OBewGnRT9OghDc7TpUaUOQHaER?w=266&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3");
+    background-image: url("https://th.bing.com/th/id/OIP.OBewGnRT9OghDc7TpUaUOQHaER?w=266&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3");
     background-position: center;
     }
 
